@@ -1,5 +1,6 @@
 import React from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 import type { Task, Stage, User } from '../types';
 import TaskCard from './TaskCard';
 
