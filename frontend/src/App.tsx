@@ -36,8 +36,10 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    console.log('User logged out');
-    // In a real app, this would handle logout
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
   };
 
   const projectsForSidebar = mockProjects.map(p => ({
