@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import type { Project, Task, FilterOptions, SortOption, Priority } from '../types';
-import KanbanView from '../components/KanbanView';
 import ListView from '../components/ListView';
 import BoardView from '../components/BoardView';
 import TimelineView from '../components/TimelineView';
@@ -66,15 +65,6 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, currentUserId, curre
 
       {/* View Content */}
       <div className="flex-1 overflow-hidden py-6">
-        {currentView === 'kanban' && (
-          <KanbanView
-            stages={project.stages}
-            tasks={filteredAndSortedTasks}
-            onTaskClick={setSelectedTask}
-            onTaskMove={handleTaskMove}
-            currentUser={currentUser}
-          />
-        )}
         {currentView === 'list' && (
           <ListView
             stages={project.stages}
@@ -83,11 +73,12 @@ const ProjectPage: React.FC<ProjectPageProps> = ({ project, currentUserId, curre
             currentUser={currentUser}
           />
         )}
-        {currentView === 'board' && (
+        {currentView === 'kanban' && (
           <BoardView
             stages={project.stages}
             tasks={filteredAndSortedTasks}
             onTaskClick={setSelectedTask}
+            onTaskMove={handleTaskMove}
             currentUser={currentUser}
           />
         )}

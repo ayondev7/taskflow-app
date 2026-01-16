@@ -9,7 +9,7 @@ import type { ViewType } from './types';
 
 const App: React.FC = () => {
   const [activeProjectId, setActiveProjectId] = useState(mockProjects[0].id);
-  const [currentView, setCurrentView] = useState<ViewType>('kanban');
+  const [currentView, setCurrentView] = useState<ViewType>('list');
   const [notifications, setNotifications] = useState(mockNotifications);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);

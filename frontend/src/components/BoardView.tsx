@@ -1,4 +1,6 @@
 import React from 'react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 import type { Task, Stage, User } from '../types';
 import TaskCard from './TaskCard';
 
@@ -6,22 +8,64 @@ interface BoardViewProps {
   stages: Stage[];
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  onTaskMove: (taskId: string, newStageId: string) => void;
   currentUser: User;
 }
 
-const BoardView: React.FC<BoardViewProps> = ({ stages, tasks, onTaskClick, currentUser }) => {
+const BoardView: React.FC<BoardViewProps> = ({
+  stages,
+  tasks,
+  onTaskClick,
+  onTaskMove,
+  currentUser
+}) => {
   const sortedStages = [...stages].sort((a, b) => a.order - b.order);
 
+  const handleDragEnd = (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+
+    // Dropped outside the list
+    if (!destination) {
+      return;
+    }
+
+    // Dropped in the same position
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    // Task moved to a different stage
+    if (destination.droppableId !== source.droppableId) {
+      const taskId = draggableId;
+      const newStageId = destination.droppableId;
+      
+      // Check if user can move this task
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        const canMove = !task.isRestricted || 
+                       task.supervisor?.id === currentUser.id || 
+                       currentUser.role === 'supervisor';
+        
+        if (canMove) {
+          onTaskMove(taskId, newStageId);
+        }
+      }
+    }
+  };
+
   return (
-    <div className="flex-1 overflow-auto px-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <div className="flex gap-4 h-full overflow-x-auto pb-4 px-6">
         {sortedStages.map(stage => {
           const stageTasks = tasks.filter(task => task.stageId === stage.id);
           
           return (
             <div
               key={stage.id}
-              className="bg-neutral-900 rounded-lg border border-neutral-800 flex flex-col"
+              className="flex-shrink-0 w-80 bg-neutral-900 rounded-lg border border-neutral-800 flex flex-col"
             >
               {/* Stage Header */}
               <div className="p-4 border-b border-neutral-800">
@@ -39,27 +83,63 @@ const BoardView: React.FC<BoardViewProps> = ({ stages, tasks, onTaskClick, curre
                 </div>
               </div>
 
-              {/* Tasks */}
-              <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
-                {stageTasks.map(task => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onTaskClick={onTaskClick}
-                    currentUser={currentUser}
-                  />
-                ))}
-                {stageTasks.length === 0 && (
-                  <div className="text-center py-6 text-neutral-600 text-sm">
-                    No tasks
+              {/* Tasks - Droppable Area */}
+              <Droppable droppableId={stage.id}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className={`flex-1 overflow-y-auto p-4 space-y-3 transition-colors ${
+                      snapshot.isDraggingOver ? 'bg-neutral-800/50' : ''
+                    }`}
+                  >
+                    {stageTasks.map((task, index) => {
+                      const canMove = !task.isRestricted || 
+                                     task.supervisor?.id === currentUser.id || 
+                                     currentUser.role === 'supervisor';
+                      
+                      return (
+                        <Draggable 
+                          key={task.id} 
+                          draggableId={task.id} 
+                          index={index}
+                          isDragDisabled={!canMove}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                ...provided.draggableProps.style,
+                                opacity: snapshot.isDragging ? 0.8 : 1,
+                              }}
+                            >
+                              <TaskCard
+                                task={task}
+                                onTaskClick={onTaskClick}
+                                currentUser={currentUser}
+                                isDragging={snapshot.isDragging}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                    {stageTasks.length === 0 && (
+                      <div className="text-center py-8 text-neutral-600 text-sm">
+                        No tasks
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
+              </Droppable>
             </div>
           );
         })}
       </div>
-    </div>
+    </DragDropContext>
   );
 };
 

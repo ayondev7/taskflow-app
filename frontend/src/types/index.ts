@@ -1,5 +1,5 @@
 export type Priority = 'low' | 'medium' | 'high' | 'urgent';
-export type ViewType = 'kanban' | 'list' | 'board' | 'timeline';
+export type ViewType = 'list' | 'kanban' | 'timeline';
 export type UserRole = 'supervisor' | 'member';
 export type ProjectStatus = 'active' | 'archived';
 export type NotificationType = 'task_assigned' | 'task_reassigned' | 'stage_changed' | 'mentioned' | 'project_access';
