@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import TopNav from './components/TopNav';
 import MobileHeader from './components/MobileHeader';
 import ProjectPage from './pages/ProjectPage';
+import AddProjectModal from './components/AddProjectModal';
 import { mockProjects, mockNotifications, currentUser } from './config/mockData';
 import type { ViewType } from './types';
 
@@ -11,6 +12,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>('kanban');
   const [notifications, setNotifications] = useState(mockNotifications);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
 
   const activeProject = mockProjects.find(p => p.id === activeProjectId);
 
@@ -31,8 +33,7 @@ const App: React.FC = () => {
   };
 
   const handleCreateProject = () => {
-    console.log('Create new project');
-    // In a real app, this would open a modal to create a new project
+    setShowAddProjectModal(true);
   };
 
   const handleLogout = () => {
@@ -78,6 +79,7 @@ const App: React.FC = () => {
           currentUser={currentUser}
           onMarkNotificationRead={handleMarkNotificationRead}
           onLogout={handleLogout}
+          onCreateProject={handleCreateProject}
         />
 
         {/* Project Content */}
@@ -89,6 +91,11 @@ const App: React.FC = () => {
           searchQuery={searchQuery}
         />
       </div>
+
+      {/* Add Project Modal */}
+      {showAddProjectModal && (
+        <AddProjectModal onClose={() => setShowAddProjectModal(false)} />
+      )}
     </div>
   );
 };

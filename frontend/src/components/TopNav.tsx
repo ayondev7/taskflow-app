@@ -10,6 +10,7 @@ interface TopNavProps {
   currentUser: User;
   onMarkNotificationRead: (notificationId: string) => void;
   onLogout: () => void;
+  onCreateProject: () => void;
 }
 
 const TopNav: React.FC<TopNavProps> = ({
@@ -20,7 +21,8 @@ const TopNav: React.FC<TopNavProps> = ({
   notifications,
   currentUser,
   onMarkNotificationRead,
-  onLogout
+  onLogout,
+  onCreateProject
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -99,6 +101,17 @@ const TopNav: React.FC<TopNavProps> = ({
 
       {/* Right Section */}
       <div className="flex items-center gap-4 sm:w-full">
+        {/* New Project Button */}
+        <button
+          onClick={onCreateProject}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors sm:hidden"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          <span>New Project</span>
+        </button>
+
         {/* Search */}
         <div className="relative sm:flex-1">
           <input
